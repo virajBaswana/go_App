@@ -1,8 +1,9 @@
 package connection
 
 import (
-	"database/sql"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Connection struct {
@@ -15,7 +16,7 @@ type Connection struct {
 }
 
 type ConnectionModel struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
 func (c *ConnectionModel) CreateConnection(body *Connection) (*Connection, error) {
@@ -23,9 +24,9 @@ func (c *ConnectionModel) CreateConnection(body *Connection) (*Connection, error
 		INSERT INTO connections (target_id , initiator_id , is_reciprocated)
 		VALUES ($1, $2 , $3) RETURNING *;
 		`
-	row := c.db.QueryRow(sqlStmt, body.TargetId, body.InitiatorId, body.Is_Reciprocated)
+	row := c.db.QueryRowx(sqlStmt, body.TargetId, body.InitiatorId, body.Is_Reciprocated)
 	connection := &Connection{}
-	if err := row.Scan(&connection.Id, &connection.TargetId, &connection.InitiatorId, &connection.Is_Reciprocated, &connection.Created_At, &connection.Updated_At); err != nil {
+	if err := row.StructScan(connection); err != nil {
 		return nil, err
 	}
 	return connection, nil

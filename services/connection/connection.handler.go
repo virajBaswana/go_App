@@ -1,10 +1,11 @@
 package connection
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"viraj_golang/utils"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type ConnectionHandler struct {
@@ -12,7 +13,7 @@ type ConnectionHandler struct {
 	model  *ConnectionModel
 }
 
-func InitConnectionService(mux *http.ServeMux, database *sql.DB) {
+func InitConnectionService(mux *http.ServeMux, database *sqlx.DB) {
 	connectionHandler := &ConnectionHandler{
 		router: mux,
 		model:  &ConnectionModel{db: database},

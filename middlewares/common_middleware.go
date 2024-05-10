@@ -14,9 +14,9 @@ type Middleware func(http.HandlerFunc) http.HandlerFunc
 func RequestLogger(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		fmt.Println("INSIDE REQUEST LOGGER MIDDLEWARE")
+
 		next.ServeHTTP(w, r)
-		fmt.Println("OUTSIDE REQUEST LOGGER MIDDLEWARE")
+
 		log.Printf("\n Method: %v , Request Origin : %v , time_taken : %v , path : %v \n", r.Method, r.RemoteAddr, time.Since(start), r.URL.Path)
 	}
 }
@@ -57,7 +57,7 @@ func CheckAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 		claims, err := utils.ValidateJwtAndExtractClaims(jwtToken)
 		if err != nil {
-			fmt.Print("here")
+
 			http.Error(w, err.Error(), http.StatusNetworkAuthenticationRequired)
 			return
 		}
@@ -66,9 +66,9 @@ func CheckAuth(next http.HandlerFunc) http.HandlerFunc {
 		ctx := r.Context()
 		ctx = context.WithValue(ctx, userId, claims)
 		r = r.WithContext(ctx)
-		fmt.Print(claims)
+
 		next.ServeHTTP(w, r)
-		fmt.Println("OUTSIDE auth MIDDLEWARE")
+
 	})
 }
 

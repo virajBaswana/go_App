@@ -1,7 +1,6 @@
 package user
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,6 +8,7 @@ import (
 	"viraj_golang/middlewares"
 	"viraj_golang/utils"
 
+	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,7 +17,7 @@ type UserHandler struct {
 	userModel *UserModel
 }
 
-func InitUserRoutes(mux *http.ServeMux, database *sql.DB) {
+func InitUserRoutes(mux *http.ServeMux, database *sqlx.DB) {
 	user := &UserHandler{
 		router:    mux,
 		userModel: &UserModel{dB: database},
@@ -94,15 +94,20 @@ func (user *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 func (user *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	user_id, err := strconv.Atoi(r.PathValue("id"))
+
 	if err != nil {
+
 		http.Error(w, "pass valid user id", http.StatusBadRequest)
 	}
 	if user_id != 0 {
+
 		foundUser, err := user.userModel.GetById(user_id)
 		if err != nil {
+
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 		if foundUser != nil {
+
 			utils.SuccessfullyFoundOne(w, &utils.JsonResponse{Code: http.StatusFound, Message: "User found", Body: map[string]any{"user": foundUser}})
 		}
 

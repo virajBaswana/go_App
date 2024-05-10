@@ -38,7 +38,6 @@ func ExtractJwtFromAuthHeader(r *http.Request) (string, error) {
 		return "", fmt.Errorf("pass Bearer token to proceed")
 	}
 	token := tokenarr[1]
-	fmt.Print(token)
 	return token, nil
 }
 
