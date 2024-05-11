@@ -26,11 +26,9 @@ func EstablishandVerifyDBConnection() (*sqlx.DB, error) {
 		"file://db/migrations",
 		"postgres://postgres:postgres@localhost:5432/go_practice?sslmode=disable")
 	if err != nil {
-		fmt.Println("asdfasdfa")
 		log.Fatal(err)
 	}
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		fmt.Println("asdfasdfa")
 		log.Fatal(err)
 	}
 	fmt.Println("db connected and migrations done")

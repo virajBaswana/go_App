@@ -2,4 +2,5 @@ run:
 	go run main.go
 
 build:
-	go build -o /bin/run main.go
+	/usr/local/go/bin/go build -o /bin/run main.go 
+
