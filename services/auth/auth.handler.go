@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"viraj_golang/services/user"
-	"viraj_golang/utils"
+
+	"github.com/virajBaswana/go_App/services/user"
+	"github.com/virajBaswana/go_App/utils"
 
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"

@@ -3,8 +3,9 @@ package user
 import (
 	"net/http"
 	"strconv"
-	"viraj_golang/middlewares"
-	"viraj_golang/utils"
+
+	"github.com/virajBaswana/go_App/middlewares"
+	"github.com/virajBaswana/go_App/utils"
 
 	"github.com/jmoiron/sqlx"
 )

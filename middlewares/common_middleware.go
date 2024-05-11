@@ -6,7 +6,8 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"viraj_golang/utils"
+
+	"github.com/virajBaswana/go_App/utils"
 )
 
 type Middleware func(http.Handler) http.Handler

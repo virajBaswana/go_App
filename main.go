@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"viraj_golang/db"
-	"viraj_golang/middlewares"
-	"viraj_golang/services/auth"
-	"viraj_golang/services/connection"
-	"viraj_golang/services/user"
+
+	"github.com/virajBaswana/go_App/db"
+	"github.com/virajBaswana/go_App/middlewares"
+	"github.com/virajBaswana/go_App/services/auth"
+	"github.com/virajBaswana/go_App/services/connection"
+	"github.com/virajBaswana/go_App/services/user"
 )
 
 func main() {
