@@ -9,19 +9,20 @@ import (
 	"viraj_golang/utils"
 )
 
-type Middleware func(http.HandlerFunc) http.HandlerFunc
+type Middleware func(http.Handler) http.Handler
 
-func RequestLogger(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func RequestLogger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
 		next.ServeHTTP(w, r)
 
 		log.Printf("\n Method: %v , Request Origin : %v , time_taken : %v , path : %v \n", r.Method, r.RemoteAddr, time.Since(start), r.URL.Path)
-	}
+
+	})
 }
 
-func RecoverPanic(next http.HandlerFunc) http.HandlerFunc {
+func RecoverPanic(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -35,7 +36,7 @@ func RecoverPanic(next http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func SecureHeaders(next http.HandlerFunc) http.HandlerFunc {
+func SecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Security-Policy",
 			"default-src 'self'; style-src 'self' fonts.googleapis.com; font-src fonts.gstatic.com")
@@ -48,7 +49,7 @@ func SecureHeaders(next http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func CheckAuth(next http.HandlerFunc) http.HandlerFunc {
+func CheckAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		jwtToken, err := utils.ExtractJwtFromAuthHeader(r)
 		if err != nil {
@@ -73,7 +74,7 @@ func CheckAuth(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func CreateMiddlewareStack(xs ...Middleware) Middleware {
-	return func(next http.HandlerFunc) http.HandlerFunc {
+	return func(next http.Handler) http.Handler {
 		for i := len(xs) - 1; i >= 0; i-- {
 			next = xs[i](next)
 		}

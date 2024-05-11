@@ -19,13 +19,13 @@ type User struct {
 }
 
 type UserModel struct {
-	dB *sqlx.DB
+	DB *sqlx.DB
 }
 
 func (u *UserModel) InsertOne(user *User) (int, error) {
 	sqlStatement := `INSERT INTO users (first_name , last_name , email , password) VALUES ($1 ,$2 ,$3 ,$4) RETURNING id;`
 	var insertId int
-	err := u.dB.QueryRowx(sqlStatement, user.First_Name, user.Last_Name, user.Email, user.Password).Scan(&insertId)
+	err := u.DB.QueryRowx(sqlStatement, user.First_Name, user.Last_Name, user.Email, user.Password).Scan(&insertId)
 
 	if err != nil {
 		return 0, err
@@ -36,7 +36,7 @@ func (u *UserModel) GetById(id int) (*User, error) {
 	query := `SELECT * FROM users WHERE id=$1;`
 	user := &User{}
 	fmt.Println(id)
-	if err := u.dB.QueryRowx(query, id).StructScan(user); err != nil {
+	if err := u.DB.QueryRowx(query, id).StructScan(user); err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println(err.Error())
 			return nil, fmt.Errorf("no rows found where id : %v", id)
@@ -47,7 +47,7 @@ func (u *UserModel) GetById(id int) (*User, error) {
 }
 func (u *UserModel) GetAll() ([]*User, error) {
 	sqlStmt := `SELECT * FROM users limit 20;`
-	rows, err := u.dB.Queryx(sqlStmt)
+	rows, err := u.DB.Queryx(sqlStmt)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (u *UserModel) UpdateOne(id int, user User) {}
 func (u *UserModel) DeleteById(id int)           {}
 func (u *UserModel) FindByEmail(email string) ([]*User, error) {
 	query := `SELECT * FROM users WHERE email=$1`
-	rows, err := u.dB.Queryx(query, email)
+	rows, err := u.DB.Queryx(query, email)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
