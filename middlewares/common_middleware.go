@@ -63,13 +63,14 @@ func CheckAuth(next http.Handler) http.Handler {
 			http.Error(w, err.Error(), http.StatusNetworkAuthenticationRequired)
 			return
 		}
-		type UserIdClaim string
-		var userId UserIdClaim
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, userId, claims)
-		r = r.WithContext(ctx)
+		ctx = context.WithValue(ctx, utils.UserId, claims)
 
-		next.ServeHTTP(w, r)
+		req := r.WithContext(ctx)
+
+		// log.Println(r.WithContext(ctx).Context().Value(userId).(string))
+
+		next.ServeHTTP(w, req)
 
 	})
 }
@@ -81,4 +82,10 @@ func CreateMiddlewareStack(xs ...Middleware) Middleware {
 		}
 		return next
 	}
+}
+
+func CreateHandlerFromHandlerFunc(h http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	})
 }

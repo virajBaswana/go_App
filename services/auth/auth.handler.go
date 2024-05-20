@@ -18,7 +18,7 @@ type AuthHandler struct {
 	authModel *user.UserModel
 }
 
-func InitAuthRoutes(database *sqlx.DB) *http.ServeMux {
+func InitRoutes(database *sqlx.DB) *http.ServeMux {
 	authRouter := http.NewServeMux()
 
 	authHandler := &AuthHandler{

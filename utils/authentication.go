@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,6 +11,10 @@ import (
 )
 
 const hmacSecret string = "sdhfbviuasbfilvabsid"
+
+type UserIdClaim string
+
+var UserId UserIdClaim = "not attached yet"
 
 func HashPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 2)
@@ -62,5 +67,15 @@ func ValidateJwtAndExtractClaims(tokenString string) (string, error) {
 		fmt.Println(err)
 		return "", err
 	}
+}
 
+func ExtractClaimsFromRequest(c context.Context) string {
+	user_id, _ := c.Value(UserId).(string)
+
+	// log.Println(ok)
+	// log.Println(user_id)
+	// if !ok {
+	// 	return ""
+	// }
+	return user_id
 }

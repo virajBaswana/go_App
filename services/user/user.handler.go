@@ -15,7 +15,7 @@ type UserHandler struct {
 	userModel *UserModel
 }
 
-func InitUserRoutes(database *sqlx.DB) *http.ServeMux {
+func InitRoutes(database *sqlx.DB) *http.ServeMux {
 	userRouter := http.NewServeMux()
 	middlewares.CheckAuth(userRouter)
 
@@ -54,13 +54,20 @@ func (user *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 func (user *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	var users = []*User{}
 	users, err := user.userModel.GetAll()
-	r.URL.Query()
-	if err != nil {
-		http.Error(w, "Could not fetch all users", http.StatusInternalServerError)
-	}
-	resp := &utils.JsonResponse{Code: 200, Message: "Fetched all users", Body: map[string]any{"users": users}}
 
-	utils.SuccessfullyFetchedAll(w, resp)
+	userId := utils.ExtractClaimsFromRequest(r.Context())
+	if userId == "" {
+		http.Error(w, "login and process jwt properly", http.StatusUnauthorized)
+	} else {
+		r.URL.Query()
+		if err != nil {
+			http.Error(w, "Could not fetch all users", http.StatusInternalServerError)
+		}
+		resp := &utils.JsonResponse{Code: 200, Message: "Fetched all users", Body: map[string]any{"users": users}}
+
+		utils.SuccessfullyFetchedAll(w, resp)
+
+	}
 
 }
 func (user *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {}

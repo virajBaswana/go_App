@@ -16,7 +16,7 @@ type ConnectionHandler struct {
 	model  *ConnectionModel
 }
 
-func InitConnectionService(database *sqlx.DB) *http.ServeMux {
+func InitRoutes(database *sqlx.DB) *http.ServeMux {
 	connectionRouter := http.NewServeMux()
 	middlewares.CheckAuth(connectionRouter)
 	connectionHandler := &ConnectionHandler{
