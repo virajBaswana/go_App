@@ -1,6 +1,8 @@
 package room
 
-import "time"
+import (
+	"time"
+)
 
 type Room struct {
 	Id          int       `json:"id"`

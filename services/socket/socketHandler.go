@@ -4,29 +4,34 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
+
 	"github.com/virajBaswana/go_App/utils"
 )
 
-var SocketConnections = make(map[*websocket.Conn]map[string]bool)
+var SocketConnections = make(map[*websocket.Conn]string)
+
+var UserSocketMap = make(map[string]map[*websocket.Conn]bool)
+
+type SendMessage struct {
+	Sender_id   int    `json:"sender_id"`
+	Receiver_id int    `json:"receiver_id"`
+	Message     string `json:"message"`
+}
+
+var MessageChannel = make(chan SendMessage)
 
 var Upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
 
-type SocketHandler struct {
-	// ws *websocket.Conn
-	// database *sqlx.DB
-}
-
 func NewSocketConnection(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("nwnww")
 	Upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-	fmt.Println("nwnww")
-	fmt.Println(r)
+
 	user_id := utils.ExtractClaimsFromRequest(r.Context())
 
 	conn, err := Upgrader.Upgrade(w, r, nil)
@@ -34,39 +39,63 @@ func NewSocketConnection(w http.ResponseWriter, r *http.Request) {
 		log.Println("error")
 		fmt.Println(err.Error())
 	}
-	val := map[string]bool{
-		user_id: true,
-	}
-	SocketConnections[conn] = val
+
+	SocketConnections[conn] = user_id
+	UserSocketMap[user_id] = map[*websocket.Conn]bool{conn: true}
 	// fmt.Printf("new connection for user :::---> %v", SocketConnections[user_id])
-	fmt.Println(user_id)
-	for k, v := range SocketConnections {
-		fmt.Println(k)
-		fmt.Println(v)
+	// fmt.Println(user_id)
+	for _, v := range SocketConnections {
+		// fmt.Println(k)
+		fmt.Println("client %v", v)
 	}
-	reader(conn)
+	go reader(conn, MessageChannel)
+	go writer(MessageChannel)
 }
-func reader(ws *websocket.Conn) {
+func reader(ws *websocket.Conn, mc chan SendMessage) {
 	for {
-		messageType, p, err := ws.ReadMessage()
+		message := &SendMessage{}
+		err := ws.ReadJSON(message)
 		if err != nil {
-			// fmt.Println("here")
-			// log.Println(err.Error())
-			break
+			ws.Close()
+			user_id := SocketConnections[ws]
+			delete(SocketConnections, ws)
+			delete(UserSocketMap[user_id], ws)
+			fmt.Println("post deleteion socket map")
+			for _, v := range SocketConnections {
+				// fmt.Println(k)
+				fmt.Println(v)
+			}
+			return
 		}
-		log.Println(string(p))
-		if err = ws.WriteMessage(messageType, append([]byte("got ya"), p...)); err != nil {
-			fmt.Println("here also")
-			log.Println(err.Error())
-			break
-		}
+		log.Println(message)
+		mc <- *message
 	}
 
-	ws.Close()
-	delete(SocketConnections, ws)
-	fmt.Println("post deleteion socket map")
-	for k, v := range SocketConnections {
-		fmt.Println(k)
-		fmt.Println(v)
+}
+
+func writer(mc chan SendMessage) {
+	for {
+		message := <-mc
+		receiver := message.Receiver_id
+		receiverConnectionsmap := UserSocketMap[strconv.Itoa(receiver)]
+
+		for conn := range receiverConnectionsmap {
+			if err := conn.WriteJSON(message); err != nil {
+				conn.Close()
+				user_id := SocketConnections[conn]
+				delete(SocketConnections, conn)
+				delete(UserSocketMap[user_id], conn)
+				// value = false
+
+				fmt.Println("post deleteion socket map")
+				for _, v := range SocketConnections {
+					// fmt.Println(k)
+					fmt.Println(v)
+				}
+				return
+			}
+
+		}
+
 	}
 }
