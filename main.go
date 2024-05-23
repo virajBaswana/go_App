@@ -9,7 +9,6 @@ import (
 	"github.com/virajBaswana/go_App/middlewares"
 	"github.com/virajBaswana/go_App/services/auth"
 	"github.com/virajBaswana/go_App/services/connection"
-	"github.com/virajBaswana/go_App/services/socket"
 
 	"github.com/virajBaswana/go_App/services/user"
 )
@@ -24,6 +23,10 @@ func main() {
 
 	// main router
 	mux := http.NewServeMux()
+
+	//web sockets
+	sockethub := newSocketHub()
+	go sockethub.run()
 	//registering all the routes and paths
 	//sub routers
 	authRouter := auth.InitRoutes(db)

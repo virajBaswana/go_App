@@ -77,5 +77,6 @@ func ExtractClaimsFromRequest(c context.Context) string {
 	// if !ok {
 	// 	return ""
 	// }
+
 	return user_id
 }

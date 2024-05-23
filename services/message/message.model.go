@@ -7,6 +7,12 @@ type Message struct {
 	Content string `json:"content"`
 }
 
+type SocketMessage struct {
+	Sender_id   int    `json:"sender_id"`
+	Receiver_id int    `json:"receiver_id"`
+	Content     string `json:"content"`
+}
+
 type MessageExchange struct {
 	Id           int       `json:"id"`
 	Message_Id   int       `json:"message_id"`
