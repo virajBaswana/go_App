@@ -10,4 +10,4 @@ migrate_down:
 migrate:
 	migrate create -ext sql -dir db/migrations -seq db
 
-das
+dasasfdasdasd
